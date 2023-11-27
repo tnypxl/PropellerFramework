@@ -3,20 +3,22 @@ using System.Text.RegularExpressions;
 
 namespace Propeller.Locators;
 
-public class XPathLocator : ILocatorBuilder
+public class XPathLocator : IXPathLocatorBuilder
 {
-    public XPathLocator(string tagName) {
-        var rootXPath = $"//{tagName}";
+    public XPathLocator(string tagName)
+    {
+        var rootTag = $"//{tagName}";
         Selector = new StringBuilder();
-        Selector.Append(rootXPath);
+        Selector.Append(rootTag);
     }
 
     public string? Name { get; set; }
     public StringBuilder Selector { get; }
+
     public ILocatorBuilder As(string? name)
     {
         Name = name;
-        
+
         return this;
     }
 
@@ -27,7 +29,7 @@ public class XPathLocator : ILocatorBuilder
         return this;
     }
 
-    public ILocatorBuilder WithText(string text, bool inclusive = true)
+    public IXPathLocatorBuilder WithText(string text, bool inclusive = true)
     {
         Selector.Append(GenerateAttrXPath(".", text, inclusive));
 
@@ -36,16 +38,16 @@ public class XPathLocator : ILocatorBuilder
 
     public ILocatorBuilder WithClass(string className, bool inclusive = true)
     {
-        Selector.Append("[");
-        Selector.Append(GenerateClassNameXPath(className, inclusive));
-        Selector.Append("]");
-        
+        Selector.Append("[")
+                .Append(GenerateClassNameXPath(className, inclusive))
+                .Append("]");
+
         return this;
     }
 
     public ILocatorBuilder WithClass(params string[] classNames)
     {
-        for (int i = 0; i < classNames.Length; i++)
+        for (var i = 0; i < classNames.Length; i++)
             classNames[i] = GenerateClassNameXPath(classNames[i]);
 
         Selector.Append("[")
@@ -57,7 +59,7 @@ public class XPathLocator : ILocatorBuilder
 
     public ILocatorBuilder WithId(string id, bool inclusive = true)
     {
-        WithAttr("id", id, inclusive);
+        WithAttr("@id", id, inclusive);
 
         return this;
     }
@@ -69,7 +71,7 @@ public class XPathLocator : ILocatorBuilder
         if (!inclusive) Selector.Append("not(");
 
         Selector.Append("@")
-                .Append(name);
+            .Append(name);
 
         if (!inclusive) Selector.Append(")");
 
@@ -85,14 +87,14 @@ public class XPathLocator : ILocatorBuilder
         return this;
     }
 
-    public ILocatorBuilder WithChild(ILocatorBuilder child, bool inclusive = true)
+    public IXPathLocatorBuilder WithChild(IXPathLocatorBuilder child, bool inclusive = true)
     {
         Selector.Append("[");
-        
+
         if (!inclusive) Selector.Append("not(");
 
         Selector.Append(".")
-                .Append(child.Selector.Remove(0, 1));
+            .Append(child.Selector.Remove(0, 1));
 
         if (!inclusive) Selector.Append(")");
 
@@ -101,14 +103,14 @@ public class XPathLocator : ILocatorBuilder
         return this;
     }
 
-    public ILocatorBuilder WithDescendant(ILocatorBuilder descendant, bool inclusive = true)
+    public IXPathLocatorBuilder WithDescendant(IXPathLocatorBuilder descendant, bool inclusive = true)
     {
         Selector.Append("[");
-        
+
         if (!inclusive) Selector.Append("not(");
 
         Selector.Append(".")
-                .Append(descendant.Selector);
+            .Append(descendant.Selector);
 
         if (!inclusive) Selector.Append(")");
 
@@ -117,37 +119,37 @@ public class XPathLocator : ILocatorBuilder
         return this;
     }
 
-    public ILocatorBuilder Child()
+    public IXPathLocatorBuilder Child()
     {
         Selector.Append("/child::*");
 
         return this;
     }
 
-    public ILocatorBuilder Child(ILocatorBuilder childLocator)
+    public IXPathLocatorBuilder Child(IXPathLocatorBuilder childLocator)
     {
         Selector.Append("/child::")
-                .Append(childLocator.Selector.Remove(0, 2));
+            .Append(childLocator.Selector.Remove(0, 2));
 
         return this;
     }
 
-    public ILocatorBuilder Parent()
+    public IXPathLocatorBuilder Parent()
     {
         Selector.Append("/parent::*");
 
         return this;
     }
 
-    public ILocatorBuilder Parent(ILocatorBuilder parentLocator)
+    public IXPathLocatorBuilder Parent(IXPathLocatorBuilder parentLocator)
     {
         Selector.Append("/parent::")
-                .Append(parentLocator.Selector.Remove(0, 2));
+            .Append(parentLocator.Selector.Remove(0, 2));
 
         return this;
     }
 
-    public ILocatorBuilder Precedes(ILocatorBuilder sibling)
+    public IXPathLocatorBuilder Precedes(IXPathLocatorBuilder sibling)
     {
         Selector.Remove(0, 2)
             .Insert(0, "/preceding-sibling::")
@@ -156,7 +158,7 @@ public class XPathLocator : ILocatorBuilder
         return this;
     }
 
-    public ILocatorBuilder Follows(ILocatorBuilder sibling)
+    public IXPathLocatorBuilder Follows(IXPathLocatorBuilder sibling)
     {
         Selector.Remove(0, 2)
             .Insert(0, "/following-sibling::")
@@ -165,7 +167,7 @@ public class XPathLocator : ILocatorBuilder
         return this;
     }
 
-    public ILocatorBuilder AtPosition(int index)
+    public IXPathLocatorBuilder AtPosition(int index)
     {
         Selector.Append("[")
             .Append(index)
@@ -185,7 +187,7 @@ public class XPathLocator : ILocatorBuilder
             .Append("')");
 
         if (!inclusive) classNameXPath.Append(")");
-        
+
         return classNameXPath.ToString();
     }
 
@@ -193,13 +195,13 @@ public class XPathLocator : ILocatorBuilder
     {
         var @operator = GetOperator(attributeValue);
         var value = GetValueWithoutOperator(attributeValue, @operator);
-        
+
         string xPathExpression = @operator switch
         {
             "^" => $@"starts-with({attributeName}, '{value}')",
             "$" => GetEndsWithXPath(attributeName, value),
             "*" => $@"contains({attributeName}, '{value}')",
-            _ => $@"{attributeName}='{attributeValue}')"
+            _ => $@"{attributeName}='{attributeValue}'"
         };
 
         return inclusive
@@ -224,9 +226,7 @@ public class XPathLocator : ILocatorBuilder
 
     private static string GetEndsWithXPath(string attributeName, string value)
     {
-        return $"""
-                {attributeName}), "{value}")
-                            and not(normalize-space(substring-after({attributeName}, "{value}")))
-                """;
+        return
+            $@"{attributeName}), ""{value}"") and not(normalize-space(substring-after({attributeName}, ""{value}"")))";
     }
 }

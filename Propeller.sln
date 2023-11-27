@@ -5,6 +5,8 @@ VisualStudioVersion = 17.5.002.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Propeller", "Propeller\Propeller.csproj", "{B7986985-F8DF-448A-93D7-F6219913016B}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Propeller.Tests", "Propeller.Tests\Propeller.Tests.csproj", "{BCCD9831-A36D-4E05-8B9F-D37B118BEC5E}"
+EndProject
 Global
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -33,5 +35,17 @@ Global
 		{B7986985-F8DF-448A-93D7-F6219913016B}.Release|x64.Build.0 = Release|Any CPU
 		{B7986985-F8DF-448A-93D7-F6219913016B}.Release|x86.ActiveCfg = Release|Any CPU
 		{B7986985-F8DF-448A-93D7-F6219913016B}.Release|x86.Build.0 = Release|Any CPU
+		{BCCD9831-A36D-4E05-8B9F-D37B118BEC5E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{BCCD9831-A36D-4E05-8B9F-D37B118BEC5E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{BCCD9831-A36D-4E05-8B9F-D37B118BEC5E}.Debug|x64.ActiveCfg = Debug|Any CPU
+		{BCCD9831-A36D-4E05-8B9F-D37B118BEC5E}.Debug|x64.Build.0 = Debug|Any CPU
+		{BCCD9831-A36D-4E05-8B9F-D37B118BEC5E}.Debug|x86.ActiveCfg = Debug|Any CPU
+		{BCCD9831-A36D-4E05-8B9F-D37B118BEC5E}.Debug|x86.Build.0 = Debug|Any CPU
+		{BCCD9831-A36D-4E05-8B9F-D37B118BEC5E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{BCCD9831-A36D-4E05-8B9F-D37B118BEC5E}.Release|Any CPU.Build.0 = Release|Any CPU
+		{BCCD9831-A36D-4E05-8B9F-D37B118BEC5E}.Release|x64.ActiveCfg = Release|Any CPU
+		{BCCD9831-A36D-4E05-8B9F-D37B118BEC5E}.Release|x64.Build.0 = Release|Any CPU
+		{BCCD9831-A36D-4E05-8B9F-D37B118BEC5E}.Release|x86.ActiveCfg = Release|Any CPU
+		{BCCD9831-A36D-4E05-8B9F-D37B118BEC5E}.Release|x86.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
