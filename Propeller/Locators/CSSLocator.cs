@@ -2,12 +2,18 @@ using System.Text;
 
 namespace Propeller.Locators;
 
+/// <summary>
+/// Class for building CSS selectors.
+/// </summary>
 public class CssLocator : ICssLocatorBuilder
 {
+    /// <summary>
+    /// Constructor for CssLocator class.
+    /// </summary>
+    /// <param name="tagName">The name of the tag.</param>
     public CssLocator(string tagName)
     {
-        _rootTag = tagName;
-        _selector = new StringBuilder();
+        _selector = new StringBuilder(tagName);
         _selectorId = null;
         _selectorAttributes = new List<string>();
         _selectorClasses = new List<string>();
@@ -15,14 +21,19 @@ public class CssLocator : ICssLocatorBuilder
     }
 
     private bool _isDirty;
-    private readonly string _rootTag;
     private string? _selectorId;
     private readonly List<string> _selectorAttributes;
     private readonly List<string> _selectorClasses;
     private string? _selectorPseudoElement;
     private readonly StringBuilder _selector;
 
+    /// <summary>
+    /// Gets or sets the name of the CSS selector.
+    /// </summary>
     public string? Name { get; set; }
+    /// <summary>
+    /// Gets the CSS selector.
+    /// </summary>
     public StringBuilder Selector
     {
         get
@@ -37,7 +48,9 @@ public class CssLocator : ICssLocatorBuilder
     /// <summary>
     /// Sets a human-readable name for use in logging or other reporting.
     /// </summary>
-    public ILocatorBuilder As(string? name)
+    /// <param name="name">The name to set.</param>
+    /// <returns>The current CssLocator instance.</returns>
+    public ICssLocatorBuilder As(string? name)
     {
         Name = name;
         _isDirty = true;
@@ -45,8 +58,12 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
-
-    public ILocatorBuilder Inside(ILocatorBuilder parent)
+    /// <summary>
+    /// Sets the parent of the current CSS selector.
+    /// </summary>
+    /// <param name="parent">The parent CSS selector.</param>
+    /// <returns>The current CssLocator instance.</returns>
+    public ICssLocatorBuilder Inside(ICssLocatorBuilder parent)
     {
         _selector.Insert(0, " ")
                  .Insert(0, parent.Selector);
@@ -56,7 +73,12 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
-    public ILocatorBuilder WithClass(string className, bool inclusive = true)
+    /// <summary>
+    /// Adds a class to the CSS selector.
+    /// </summary>
+    /// <param name="className">The class name to add.</param>
+    /// <returns>The current CssLocator instance.</returns>
+    public ICssLocatorBuilder WithClass(string className)
     {
         AddClassName(className);
 
@@ -65,7 +87,12 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
-    public ILocatorBuilder WithClass(params string[] classNames)
+    /// <summary>
+    /// Adds multiple classes to the CSS selector.
+    /// </summary>
+    /// <param name="classNames">The class names to add.</param>
+    /// <returns>The current CssLocator instance.</returns>
+    public ICssLocatorBuilder WithClass(params string[] classNames)
     {
         foreach (var className in classNames)
         {
@@ -77,7 +104,12 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
-    public ILocatorBuilder WithId(string id, bool inclusive = true)
+    /// <summary>
+    /// Sets the id of the CSS selector.
+    /// </summary>
+    /// <param name="id">The id to set.</param>
+    /// <returns>The current CssLocator instance.</returns>
+    public ICssLocatorBuilder WithId(string id)
     {
         _selectorId = id;
 
@@ -86,7 +118,12 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
-    public ILocatorBuilder WithAttr(string name, bool inclusive = true)
+    /// <summary>
+    /// Adds an attribute to the CSS selector.
+    /// </summary>
+    /// <param name="name">The attribute name to add.</param>
+    /// <returns>The current CssLocator instance.</returns>
+    public ICssLocatorBuilder WithAttr(string name)
     {
         AddAttribute($"[{name}]");
 
@@ -95,7 +132,13 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
-    public ILocatorBuilder WithAttr(string name, string value, bool inclusive = true)
+    /// <summary>
+    /// Adds an attribute with a value to the CSS selector.
+    /// </summary>
+    /// <param name="name">The attribute name to add.</param>
+    /// <param name="value">The attribute value to add.</param>
+    /// <returns>The current CssLocator instance.</returns>
+    public ICssLocatorBuilder WithAttr(string name, string value)
     {
         AddAttribute($"[{name}='{value}']");
 
@@ -104,6 +147,29 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
+    /// <summary>
+    /// Adds multiple attributes to the CSS selector.
+    /// </summary>
+    /// <param name="attrs">The attributes to add. Each attribute is a tuple where the first item is the attribute name and the second item is the attribute value.</param>
+    /// <returns>The current CssLocator instance.</returns>
+    public ICssLocatorBuilder WithAttr(params (string Name, string? Value)[] attrs)
+    {
+        foreach (var attr in attrs)
+        {
+            _ = attr.Value == null
+                ? WithAttr(attr.Name)
+                : WithAttr(attr.Name, attr.Value);
+        }
+
+        _isDirty = true;
+
+        return this;
+    }
+
+    /// <summary>
+    /// Sets the CSS selector to target the first child.
+    /// </summary>
+    /// <returns>The current CssLocator instance.</returns>
     public ICssLocatorBuilder FirstChild()
     {
         _selectorPseudoElement = "::first-child";
@@ -112,6 +178,10 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets the CSS selector to target the only child.
+    /// </summary>
+    /// <returns>The current CssLocator instance.</returns>
     public ICssLocatorBuilder OnlyChild()
     {
         _selectorPseudoElement = "::only-child";
@@ -120,6 +190,10 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets the CSS selector to target the only child of its type.
+    /// </summary>
+    /// <returns>The current CssLocator instance.</returns>
     public ICssLocatorBuilder OnlyOfType()
     {
         _selectorPseudoElement = "::only-of-type";
@@ -128,6 +202,10 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets the CSS selector to target the first child of its type.
+    /// </summary>
+    /// <returns>The current CssLocator instance.</returns>
     public ICssLocatorBuilder FirstOfType()
     {
         _selectorPseudoElement = "::first-of-type";
@@ -136,6 +214,10 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets the CSS selector to target the last child.
+    /// </summary>
+    /// <returns>The current CssLocator instance.</returns>
     public ICssLocatorBuilder LastChild()
     {
         _selectorPseudoElement = "::last-child";
@@ -144,6 +226,10 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets the CSS selector to target the last child of its type.
+    /// </summary>
+    /// <returns>The current CssLocator instance.</returns>
     public ICssLocatorBuilder LastOfType()
     {
         _selectorPseudoElement = "::last-of-type";
@@ -152,6 +238,11 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets the CSS selector to target the nth child.
+    /// </summary>
+    /// <param name="index">The index of the child to target.</param>
+    /// <returns>The current CssLocator instance.</returns>
     public ICssLocatorBuilder NthChild(int index)
     {
         _selectorPseudoElement = $"::nth-child({index})";
@@ -160,6 +251,11 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
+    /// <summary>
+    /// Sets the CSS selector to target the nth child of its type.
+    /// </summary>
+    /// <param name="index">The index of the child to target.</param>
+    /// <returns>The current CssLocator instance.</returns>
     public ICssLocatorBuilder NthOfType(int index)
     {
         _selectorPseudoElement = $"::nth-of-type({index})";
@@ -168,17 +264,22 @@ public class CssLocator : ICssLocatorBuilder
         return this;
     }
 
+    /// <summary>
+    /// Builds the CSS selector.
+    /// </summary>
     private void BuildSelector()
     {
         _selector
-            .Clear()
-            .Append(_rootTag)
             .Append(_selectorId != null ? $"#{_selectorId}" : string.Empty)
             .Append(BuildSelectorAttributes())
             .Append(BuildSelectorClasses())
             .Append(_selectorPseudoElement ?? string.Empty);
     }
 
+    /// <summary>
+    /// Builds the CSS selector classes.
+    /// </summary>
+    /// <returns>The CSS selector classes.</returns>
     private string BuildSelectorClasses()
     {
         if (_selectorClasses.Count == 0)
@@ -191,6 +292,10 @@ public class CssLocator : ICssLocatorBuilder
         return classNames.ToString();
     }
 
+    /// <summary>
+    /// Builds the CSS selector attributes.
+    /// </summary>
+    /// <returns>The CSS selector attributes.</returns>
     private string BuildSelectorAttributes()
     {
         if (_selectorAttributes.Count == 0)
@@ -203,6 +308,10 @@ public class CssLocator : ICssLocatorBuilder
         return attrs.ToString();
     }
 
+    /// <summary>
+    /// Adds an attribute to the CSS selector.
+    /// </summary>
+    /// <param name="attrName">The attribute name to add.</param>
     private void AddAttribute(string attrName)
     {
         if (_selectorAttributes.Contains(attrName))
@@ -211,6 +320,10 @@ public class CssLocator : ICssLocatorBuilder
         _selectorAttributes.Add(attrName);
     }
 
+    /// <summary>
+    /// Adds a class name to the CSS selector.
+    /// </summary>
+    /// <param name="className">The class name to add.</param>
     private void AddClassName(string className)
     {
         if (_selectorClasses.Contains($".{className}"))
